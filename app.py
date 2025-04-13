@@ -12,36 +12,30 @@ from src.text_summarizer_abstractive import summarize_text_t5
 
 st.set_page_config(page_title="Smart Summarizer", layout="centered")
 st.title("📝 Document Summarizer")
-
 st.image("design.png")
 
+if "text" not in st.session_state:
+    st.session_state.text = ""
+if "show_camera" not in st.session_state:
+    st.session_state.show_camera = False
 
-col1, col2 = st.columns([4, 1])
+
+col1, col2 = st.columns([3, 1])
 
 with col1:
     uploaded_file = st.file_uploader("📎 Upload file", type=["pdf", "docx", "png", "jpg", "jpeg", "heic"])
 
 with col2:
-    if "show_camera" not in st.session_state:
-        st.session_state.show_camera = False
-
     if st.button("📷 Take Photo", use_container_width=True):
         st.session_state.show_camera = True
 
     photo = None
     if st.session_state.show_camera:
         photo = st.camera_input("📸 Capture your image")
-
-
         if photo:
-            st.session_state.show_camera = False
-
-
-
+            st.session_state.show_camera = False  # Optional: hide after capturing
 
 user_pasted_text = st.text_area("Or, you can paste your text here:", height=200)
-
-text_content = ""
 
 def handle_uploaded_file(file):
     suffix = file.name.split(".")[-1].lower()
@@ -68,6 +62,7 @@ def handle_uploaded_file(file):
     else:
         return ""
 
+
 if uploaded_file or photo:
     file_to_use = uploaded_file if uploaded_file else photo
     st.info("🔍 Extracting text...")
@@ -83,33 +78,32 @@ if uploaded_file or photo:
             text_content = handle_uploaded_file(file_to_use)
 
         if text_content:
-            st.success(" Text extracted successfully!")
-            st.text_area(" Extracted Text", text_content, height=250)
+            st.session_state.text = text_content
+            st.success("Text extracted successfully!")
         else:
-            st.error(" No text could be extracted.")
+            st.error("No text could be extracted.")
     except Exception as e:
-        st.error(f" Error during extraction: {str(e)}")
+        st.error(f"Error during extraction: {str(e)}")
 
 elif user_pasted_text:
-    text_content = user_pasted_text
+    st.session_state.text = user_pasted_text
 
+if st.session_state.text.strip():
+    st.text_area("Extracted Text", st.session_state.text, height=250)
 
-if text_content:
     method = st.radio("Choose summarization method", ["Extractive", "Abstractive"])
 
     if st.button("Summarize"):
         with st.spinner("Summarizing..."):
             if method == "Extractive":
-                summary = summarize_text_spacy(text_content)
+                summary = summarize_text_spacy(st.session_state.text)
             else:
-                summary = summarize_text_t5(text_content)
+                summary = summarize_text_t5(st.session_state.text)
 
         if summary:
             st.success("Summary generated.")
-            st.text_area("🧾 Summary", summary, height=200)
-
-            
+            st.text_area(" Summary", summary, height=200)
         else:
             st.warning("Summary could not be generated.")
 else:
-    st.info("📤 Please upload a file, take a photo, or paste text to begin.")
+    st.info("Please upload a file, take a photo, or paste text to begin.")
