@@ -22,11 +22,8 @@ with col1:
     uploaded_file = st.file_uploader("📎 Upload file", type=["pdf", "docx", "png", "jpg", "jpeg", "heic"])
 
 with col2:
-    show_camera = st.button("📷", help="Take a photo", use_container_width=True)
-    photo = None
-    if show_camera:
+    photo = st.camera_input("📷 Take a photo")
 
-        photo = st.camera_input("")
 
 
 user_pasted_text = st.text_area("Or, you can paste your text here:", height=200)
