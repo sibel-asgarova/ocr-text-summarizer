@@ -4,7 +4,7 @@ import math
 
 nlp = spacy.load("en_core_web_sm")
 
-def summarize_text_spacy(text, ratio=0.25):
+def summarize_text_spacy(text, ratio=0.4):
     doc = nlp(text)
 
     sentences = [sent.text for sent in doc.sents]
