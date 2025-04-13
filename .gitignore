@@ -1,0 +1,10 @@
+src/__pycache__/
+src/*.pyc
+src/summarizer_env/
+env/
+.venv/
+.vscode/
+.idea/
+.env
+*.log
+
