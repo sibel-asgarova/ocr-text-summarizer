@@ -22,7 +22,20 @@ with col1:
     uploaded_file = st.file_uploader("📎 Upload file", type=["pdf", "docx", "png", "jpg", "jpeg", "heic"])
 
 with col2:
-    photo = st.camera_input("📷 Take a photo")
+    if "show_camera" not in st.session_state:
+        st.session_state.show_camera = False
+
+    if st.button("📷 Take Photo", use_container_width=True):
+        st.session_state.show_camera = True
+
+    photo = None
+    if st.session_state.show_camera:
+        photo = st.camera_input("📸 Capture your image")
+
+
+        if photo:
+            st.session_state.show_camera = False
+
 
 
 
@@ -70,8 +83,8 @@ if uploaded_file or photo:
             text_content = handle_uploaded_file(file_to_use)
 
         if text_content:
-            st.success("✅ Text extracted successfully!")
-            st.text_area("📄 Extracted Text", text_content, height=250)
+            st.success(" Text extracted successfully!")
+            st.text_area(" Extracted Text", text_content, height=250)
         else:
             st.error(" No text could be extracted.")
     except Exception as e:
@@ -92,7 +105,7 @@ if text_content:
                 summary = summarize_text_t5(text_content)
 
         if summary:
-            st.success("✅ Summary generated.")
+            st.success("Summary generated.")
             st.text_area("🧾 Summary", summary, height=200)
 
             
